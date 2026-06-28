@@ -4,6 +4,7 @@ import com.web.liveshades.DTO.LoginRequestDTO;
 import com.web.liveshades.DTO.LoginResponceDTO;
 import com.web.liveshades.Model.User;
 import com.web.liveshades.Repository.UserRepo;
+import com.web.liveshades.Security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,9 @@ public class UserService {
 
     @Autowired
     private UserRepo userRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -65,17 +69,20 @@ public class UserService {
                 .orElse(null);
 
         if (user == null) {
-            return new LoginResponceDTO("User not found", false, null);
+            return new LoginResponceDTO("User not found", false, null, null);
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return new LoginResponceDTO("Invalid password", false, null);
+            return new LoginResponceDTO("Invalid password", false, null, null);
         }
+
+        String token = jwtUtil.generateToken(user.getEmail());
 
         return new LoginResponceDTO(
                 "Login successful",
                 true,
-                user.getRole().name()
+                user.getRole().name(),
+                token
         );
     }
 

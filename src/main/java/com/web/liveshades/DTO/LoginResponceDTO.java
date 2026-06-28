@@ -12,5 +12,6 @@ public class LoginResponceDTO {
     private String massage;
     private boolean success;
     private String role;
+    private String token;
 
 }
